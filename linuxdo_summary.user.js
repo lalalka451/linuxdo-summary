@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Linux.do 智能总结
 // @namespace    http://tampermonkey.net/
-// @version      7.9.1
+// @version      7.9.2
 // @description  Linux.do 帖子总结与导出，集成HTML离线导出和AI文本导出功能，支持话题列表总结，支持API配置历史管理，支持话题列表一键快速总结。
 // @author       半杯无糖、WolfHolo、LD Export
 // @match        https://linux.do/*
@@ -2855,6 +2855,16 @@
         _observer: null,
         _styleInjected: false,
 
+        _isDark() {
+            const el = document.querySelector('.d-header, #main-outlet, body');
+            if (!el) return false;
+            const bg = getComputedStyle(el).backgroundColor;
+            const m = bg.match(/\d+/g);
+            if (!m) return window.matchMedia('(prefers-color-scheme:dark)').matches;
+            const [r, g, b] = m.map(Number);
+            return (r * 299 + g * 587 + b * 114) / 1000 < 128;
+        },
+
         init() {
             this.injectStyles();
             this.addButtons();
@@ -2934,33 +2944,31 @@
                     .ld-qs-input{font-size:16px;}
                     .ld-qs-send{padding:10px 16px;font-size:14px;}
                 }
-                @media(prefers-color-scheme:dark){
-                    .ld-qs-modal{background:#282a36;box-shadow:0 8px 32px rgba(0,0,0,.5);}
-                    .ld-qs-header{border-color:rgba(255,255,255,.08);}
-                    .ld-qs-title{color:#f8f8f2;}
-                    .ld-qs-close{color:#6272a4;}.ld-qs-close:hover,.ld-qs-close:active{color:#f8f8f2;}
-                    .ld-qs-body{color:#f8f8f2;}
-                    .ld-qs-body blockquote{background:rgba(255,255,255,.04);border-left-color:#e3a043;}
-                    .ld-qs-body code{background:rgba(255,255,255,.08);color:#f1fa8c;}
-                    .ld-qs-body pre{background:#1e1f29;border:1px solid rgba(255,255,255,.06);}
-                    .ld-qs-body a{color:#8be9fd;}
-                    .ld-qs-body h1,.ld-qs-body h2,.ld-qs-body h3{color:#bd93f9;}
-                    .ld-qs-body strong{color:#ffb86c;}
-                    .ld-qs-footer{border-color:rgba(255,255,255,.08);}
-                    .ld-qs-input{background:#1e1f29;border-color:rgba(255,255,255,.1);color:#f8f8f2;}
-                    .ld-qs-input::placeholder{color:#6272a4;}
-                    .ld-qs-msg-user{background:rgba(227,160,67,.12);border-color:rgba(227,160,67,.25);}
-                    .ld-qs-msg-ai{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);}
-                    .ld-qs-msg-ai .ld-qs-msg-label{color:#6272a4;}
-                    .ld-qs-hist-item{background:#2f3144;border-color:rgba(255,255,255,.06);}
-                    .ld-qs-hist-title{color:#f8f8f2;}
-                    .ld-qs-hist-meta{color:#6272a4;}
-                    .ld-qs-hist-view,.ld-qs-hist-del{background:#383a4e;border-color:rgba(255,255,255,.1);color:#ccc;}
-                    .ld-qs-hist-view:hover,.ld-qs-hist-view:active{border-color:#e3a043;color:#e3a043;}
-                    .ld-qs-hist-del:hover,.ld-qs-hist-del:active{border-color:#ff5555;color:#ff5555;}
-                    .ld-qs-regen{color:#6272a4;}.ld-qs-regen:hover{color:#f8f8f2;}
-                    .ld-qs-loading span{color:#6272a4;}
-                }
+                .ld-qs-dark .ld-qs-modal{background:#282a36;box-shadow:0 8px 32px rgba(0,0,0,.5);}
+                .ld-qs-dark .ld-qs-header{border-color:rgba(255,255,255,.08);}
+                .ld-qs-dark .ld-qs-title{color:#f8f8f2;}
+                .ld-qs-dark .ld-qs-close{color:#6272a4;}.ld-qs-dark .ld-qs-close:hover,.ld-qs-dark .ld-qs-close:active{color:#f8f8f2;}
+                .ld-qs-dark .ld-qs-body{color:#f8f8f2;}
+                .ld-qs-dark .ld-qs-body blockquote{background:rgba(255,255,255,.04);border-left-color:#e3a043;}
+                .ld-qs-dark .ld-qs-body code{background:rgba(255,255,255,.08);color:#f1fa8c;}
+                .ld-qs-dark .ld-qs-body pre{background:#1e1f29;border:1px solid rgba(255,255,255,.06);}
+                .ld-qs-dark .ld-qs-body a{color:#8be9fd;}
+                .ld-qs-dark .ld-qs-body h1,.ld-qs-dark .ld-qs-body h2,.ld-qs-dark .ld-qs-body h3{color:#bd93f9;}
+                .ld-qs-dark .ld-qs-body strong{color:#ffb86c;}
+                .ld-qs-dark .ld-qs-footer{border-color:rgba(255,255,255,.08);}
+                .ld-qs-dark .ld-qs-input{background:#1e1f29;border-color:rgba(255,255,255,.1);color:#f8f8f2;}
+                .ld-qs-dark .ld-qs-input::placeholder{color:#6272a4;}
+                .ld-qs-dark .ld-qs-msg-user{background:rgba(227,160,67,.12);border-color:rgba(227,160,67,.25);}
+                .ld-qs-dark .ld-qs-msg-ai{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);}
+                .ld-qs-dark .ld-qs-msg-ai .ld-qs-msg-label{color:#6272a4;}
+                .ld-qs-dark .ld-qs-hist-item{background:#2f3144;border-color:rgba(255,255,255,.06);}
+                .ld-qs-dark .ld-qs-hist-title{color:#f8f8f2;}
+                .ld-qs-dark .ld-qs-hist-meta{color:#6272a4;}
+                .ld-qs-dark .ld-qs-hist-view,.ld-qs-dark .ld-qs-hist-del{background:#383a4e;border-color:rgba(255,255,255,.1);color:#ccc;}
+                .ld-qs-dark .ld-qs-hist-view:hover,.ld-qs-dark .ld-qs-hist-view:active{border-color:#e3a043;color:#e3a043;}
+                .ld-qs-dark .ld-qs-hist-del:hover,.ld-qs-dark .ld-qs-hist-del:active{border-color:#ff5555;color:#ff5555;}
+                .ld-qs-dark .ld-qs-regen{color:#6272a4;}.ld-qs-dark .ld-qs-regen:hover{color:#f8f8f2;}
+                .ld-qs-dark .ld-qs-loading span{color:#6272a4;}
             `;
             document.head.appendChild(css);
         },
@@ -3003,7 +3011,7 @@
         showHistoryPanel() {
             const list = SummaryCache.getAll();
             const overlay = document.createElement('div');
-            overlay.className = 'ld-qs-overlay';
+            overlay.className = 'ld-qs-overlay' + (this._isDark() ? ' ld-qs-dark' : '');
             const items = list.length ? list.map(i => `
                 <div class="ld-qs-hist-item" data-tid="${i.tid}">
                     <div class="ld-qs-hist-info">
@@ -3052,7 +3060,7 @@
 
         showCachedModal(cached) {
             const overlay = document.createElement('div');
-            overlay.className = 'ld-qs-overlay';
+            overlay.className = 'ld-qs-overlay' + (this._isDark() ? ' ld-qs-dark' : '');
             const parsed = Core.parseThinkingContent(cached.content);
             let html = '';
             if (parsed.thinking) {
@@ -3158,7 +3166,7 @@
                 if (cached) { this.showCachedModal(cached); return; }
             }
             const overlay = document.createElement('div');
-            overlay.className = 'ld-qs-overlay';
+            overlay.className = 'ld-qs-overlay' + (this._isDark() ? ' ld-qs-dark' : '');
             overlay.innerHTML = `
                 <div class="ld-qs-modal">
                     <div class="ld-qs-header">
