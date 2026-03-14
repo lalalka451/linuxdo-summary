@@ -16,8 +16,8 @@
 // @grant        GM_xmlhttpRequest
 // @connect      *
 // @license      MIT
-// @downloadURL https://update.greasyfork.org/scripts/558028/Linuxdo%20%E6%99%BA%E8%83%BD%E6%80%BB%E7%BB%93.user.js
-// @updateURL https://update.greasyfork.org/scripts/558028/Linuxdo%20%E6%99%BA%E8%83%BD%E6%80%BB%E7%BB%93.meta.js
+// @downloadURL https://raw.githubusercontent.com/lalalka451/linuxdo-summary/master/linuxdo_summary.user.js
+// @updateURL   https://raw.githubusercontent.com/lalalka451/linuxdo-summary/master/linuxdo_summary.user.js
 // ==/UserScript==
 
 (function() {
