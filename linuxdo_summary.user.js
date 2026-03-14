@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Linux.do 智能总结
 // @namespace    http://tampermonkey.net/
-// @version      7.9.5
+// @version      7.9.6
 // @description  Linux.do 帖子总结与导出，集成HTML离线导出和AI文本导出功能，支持话题列表总结，支持API配置历史管理，支持话题列表一键快速总结。
 // @author       半杯无糖、WolfHolo、LD Export
 // @match        https://linux.do/*
@@ -2908,7 +2908,8 @@
                 .ld-qs-body li{margin-bottom:4px;}
                 .ld-qs-body code{background:#f5f5f5;padding:1px 5px;border-radius:3px;font-family:monospace;word-break:break-all;}
                 .ld-qs-body pre{background:#f5f5f5;padding:10px;border-radius:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
-                .ld-qs-body blockquote{border-left:3px solid #e3a043;padding-left:12px;margin:8px 0;color:#666;}
+                .ld-qs-body blockquote{margin:12px 0;padding:12px 14px;border-left:4px solid #e3a043;border-radius:0 10px 10px 0;background:rgba(227,160,67,.08);color:#4b5563;box-shadow:inset 0 0 0 1px rgba(227,160,67,.12);}
+                .ld-qs-body blockquote p:last-child{margin-bottom:0;}
                 .ld-qs-loading{display:flex;align-items:center;gap:8px;color:#888;}
                 .ld-qs-dot{width:6px;height:6px;border-radius:50%;background:#e3a043;animation:ldqsBounce .6s infinite alternate;}
                 .ld-qs-dot:nth-child(2){animation-delay:.2s;}.ld-qs-dot:nth-child(3){animation-delay:.4s;}
@@ -2948,7 +2949,7 @@
                 .ld-qs-dark .ld-qs-title{color:#f8f8f2;}
                 .ld-qs-dark .ld-qs-close{color:#6272a4;}.ld-qs-dark .ld-qs-close:hover,.ld-qs-dark .ld-qs-close:active{color:#f8f8f2;}
                 .ld-qs-dark .ld-qs-body{color:#f8f8f2;}
-                .ld-qs-dark .ld-qs-body blockquote{background:rgba(255,255,255,.04);border-left-color:#e3a043;}
+                .ld-qs-dark .ld-qs-body blockquote{background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.08));border-left-color:#ffb454;color:#e8edf7;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);}
                 .ld-qs-dark .ld-qs-body code{background:rgba(255,255,255,.08);color:#f1fa8c;}
                 .ld-qs-dark .ld-qs-body pre{background:#1e1f29;border:1px solid rgba(255,255,255,.06);}
                 .ld-qs-dark .ld-qs-body a{color:#8be9fd;}
