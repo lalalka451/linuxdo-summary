@@ -2952,10 +2952,10 @@
                     .ld-qs-msg-user{background:rgba(227,160,67,.12);border-color:rgba(227,160,67,.25);}
                     .ld-qs-msg-ai{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);}
                     .ld-qs-msg-ai .ld-qs-msg-label{color:#6272a4;}
-                    .ld-qs-hist-item{border-color:rgba(255,255,255,.08);}
+                    .ld-qs-hist-item{background:#2f3144;border-color:rgba(255,255,255,.06);}
                     .ld-qs-hist-title{color:#f8f8f2;}
                     .ld-qs-hist-meta{color:#6272a4;}
-                    .ld-qs-hist-view,.ld-qs-hist-del{border-color:rgba(255,255,255,.12);color:#bd93f9;}
+                    .ld-qs-hist-view,.ld-qs-hist-del{background:#383a4e;border-color:rgba(255,255,255,.1);color:#ccc;}
                     .ld-qs-hist-view:hover,.ld-qs-hist-view:active{border-color:#e3a043;color:#e3a043;}
                     .ld-qs-hist-del:hover,.ld-qs-hist-del:active{border-color:#ff5555;color:#ff5555;}
                     .ld-qs-regen{color:#6272a4;}.ld-qs-regen:hover{color:#f8f8f2;}
