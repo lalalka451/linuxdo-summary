@@ -16,8 +16,8 @@
 // @grant        GM_xmlhttpRequest
 // @connect      *
 // @license      MIT
-// @downloadURL https://raw.githubusercontent.com/lalalka451/linuxdo-summary/master/linuxdo_summary.user.js
-// @updateURL   https://raw.githubusercontent.com/lalalka451/linuxdo-summary/master/linuxdo_summary.user.js
+// @downloadURL https://cdn.jsdelivr.net/gh/lalalka451/linuxdo-summary@master/linuxdo_summary.user.js
+// @updateURL   https://cdn.jsdelivr.net/gh/lalalka451/linuxdo-summary@master/linuxdo_summary.user.js
 // ==/UserScript==
 
 (function() {
