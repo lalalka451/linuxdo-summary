@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Linux.do 智能总结
 // @namespace    http://tampermonkey.net/
-// @version      7.9.2
+// @version      7.9.3
 // @description  Linux.do 帖子总结与导出，集成HTML离线导出和AI文本导出功能，支持话题列表总结，支持API配置历史管理，支持话题列表一键快速总结。
 // @author       半杯无糖、WolfHolo、LD Export
 // @match        https://linux.do/*
@@ -2856,13 +2856,12 @@
         _styleInjected: false,
 
         _isDark() {
-            const el = document.querySelector('.d-header, #main-outlet, body');
-            if (!el) return false;
-            const bg = getComputedStyle(el).backgroundColor;
+            if (document.querySelector('meta[name="darkreader"]') || document.querySelector('.darkreader')) return true;
+            if (window.matchMedia('(prefers-color-scheme:dark)').matches) return true;
+            const bg = getComputedStyle(document.querySelector('.d-header') || document.body).backgroundColor;
             const m = bg.match(/\d+/g);
-            if (!m) return window.matchMedia('(prefers-color-scheme:dark)').matches;
-            const [r, g, b] = m.map(Number);
-            return (r * 299 + g * 587 + b * 114) / 1000 < 128;
+            if (m) { const [r,g,b] = m.map(Number); return (r*299+g*587+b*114)/1000 < 128; }
+            return false;
         },
 
         init() {
