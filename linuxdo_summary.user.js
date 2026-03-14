@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Linux.do 智能总结
 // @namespace    http://tampermonkey.net/
-// @version      7.9.4
+// @version      7.9.5
 // @description  Linux.do 帖子总结与导出，集成HTML离线导出和AI文本导出功能，支持话题列表总结，支持API配置历史管理，支持话题列表一键快速总结。
 // @author       半杯无糖、WolfHolo、LD Export
 // @match        https://linux.do/*
@@ -17,7 +17,7 @@
 // @connect      *
 // @license      MIT
 // @downloadURL https://cdn.jsdelivr.net/gh/lalalka451/linuxdo-summary@latest/linuxdo_summary.user.js
-// @updateURL   https://cdn.jsdelivr.net/gh/lalalka451/linuxdo-summary@latest/linuxdo_summary.user.js
+// @updateURL   https://cdn.jsdelivr.net/gh/lalalka451/linuxdo-summary@latest/linuxdo_summary.meta.js
 // ==/UserScript==
 
 (function() {
