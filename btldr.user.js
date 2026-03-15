@@ -24,7 +24,7 @@
     // ── Config ──────────────────────────────────────────────
     const DEFAULTS = {
         apiUrl: 'https://newapirn.12121232.xyz/v1/chat/completions',
-        apiKey: 'sk-g2rL8RXKiVRh6HWCKTVcWNSBAysFFblhm2rLxhBzgWzxUSCf',
+        apiKey: '',
         model: 'gemini-3-flash-preview',
     };
     const cfg = {
