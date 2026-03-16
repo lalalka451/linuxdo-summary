@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Linux.do 智能总结
 // @namespace    http://tampermonkey.net/
-// @version      7.9.11
+// @version      7.9.12
 // @description  Linux.do 帖子总结与导出，集成HTML离线导出和AI文本导出功能，支持话题列表总结，支持API配置历史管理，支持话题列表一键快速总结。
 // @author       半杯无糖、WolfHolo、LD Export
 // @match        https://linux.do/*
@@ -3024,7 +3024,8 @@
                     const catBadge = row.querySelector('.badge-category__name');
                     const catName = catBadge?.textContent?.trim()?.toLowerCase() || '';
                     const catClass = [...row.classList].find(c => c.startsWith('category-'))?.replace('category-', '').toLowerCase() || '';
-                    if (skipCats.some(sc => catName.includes(sc) || catClass.includes(sc))) hidden = true;
+                    const tags = [...row.querySelectorAll('.discourse-tag')].map(t => t.textContent.trim().toLowerCase());
+                    if (skipCats.some(sc => catName.includes(sc) || catClass.includes(sc) || tags.some(t => t.includes(sc)))) hidden = true;
                 }
                 if (!hidden && skipTitles.length > 0) {
                     const titleEl = row.querySelector('a.title.raw-link, a.raw-topic-link');
@@ -3092,9 +3093,9 @@
                             <div class="ld-qs-filter-hint">低于此回复数的帖子不显示总结按钮（0 = 不过滤）</div>
                         </div>
                         <div class="ld-qs-filter-field">
-                            <label class="ld-qs-filter-label">跳过分类</label>
+                            <label class="ld-qs-filter-label">跳过分类/标签</label>
                             <input class="ld-qs-filter-input" id="ld-qs-fcats" type="text" value="${curCats}" placeholder="feedback, dev-test">
-                            <div class="ld-qs-filter-hint">逗号分隔，支持中文名或 slug（如 welfare, 福利羊毛）</div>
+                            <div class="ld-qs-filter-hint">逗号分隔，匹配分类名/slug/标签（如 welfare, 福利羊毛, 新人报道）</div>
                         </div>
                         <div class="ld-qs-filter-field">
                             <label class="ld-qs-filter-label">屏蔽标题关键词</label>
