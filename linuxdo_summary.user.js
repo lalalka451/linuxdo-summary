@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Linux.do 智能总结
 // @namespace    http://tampermonkey.net/
-// @version      7.9.14
+// @version      7.9.15
 // @description  Linux.do 帖子总结与导出，集成HTML离线导出和AI文本导出功能，支持话题列表总结，支持API配置历史管理，支持话题列表一键快速总结。
 // @author       半杯无糖、WolfHolo、LD Export
 // @match        https://linux.do/*
@@ -2876,20 +2876,24 @@
         },
 
         _syncFilterFromServer() {
-            GM_xmlhttpRequest({
-                method: 'GET',
-                url: 'https://monkey.12121232.xyz/api/filter',
-                onload: (resp) => {
-                    try {
-                        const d = JSON.parse(resp.responseText);
-                        if (d.minReplies !== undefined) GM_setValue(CONFIG.filterMinRepliesKey, d.minReplies);
-                        if (d.skipCats !== undefined) GM_setValue(CONFIG.filterSkipCatsKey, d.skipCats);
-                        if (d.skipTitles !== undefined) GM_setValue(CONFIG.filterSkipTitlesKey, d.skipTitles);
-                        this.refreshButtons();
-                    } catch {}
-                },
-                onerror: () => {}
-            });
+            try {
+                GM_xmlhttpRequest({
+                    method: 'GET',
+                    url: 'https://monkey.12121232.xyz/api/filter',
+                    timeout: 5000,
+                    onload: (resp) => {
+                        try {
+                            const d = JSON.parse(resp.responseText);
+                            if (d.minReplies !== undefined) GM_setValue(CONFIG.filterMinRepliesKey, d.minReplies);
+                            if (d.skipCats !== undefined) GM_setValue(CONFIG.filterSkipCatsKey, d.skipCats);
+                            if (d.skipTitles !== undefined) GM_setValue(CONFIG.filterSkipTitlesKey, d.skipTitles);
+                            this.refreshButtons();
+                        } catch {}
+                    },
+                    onerror: () => {},
+                    ontimeout: () => {}
+                });
+            } catch {}
         },
 
         injectStyles() {
