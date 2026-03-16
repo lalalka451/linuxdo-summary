@@ -3300,8 +3300,10 @@
         },
 
         refreshButtons() {
+            if (this._observer) this._observer.disconnect();
             document.querySelectorAll('.ld-qs-btn').forEach(b => b.remove());
             this.addButtons();
+            if (this._observer) this._observer.observe(document.body, { childList: true, subtree: true });
         },
 
         async showModal(tid, title, forceRefresh) {
