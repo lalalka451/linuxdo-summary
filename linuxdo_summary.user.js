@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Linux.do 智能总结
 // @namespace    http://tampermonkey.net/
-// @version      7.9.6
+// @version      7.9.7
 // @description  Linux.do 帖子总结与导出，集成HTML离线导出和AI文本导出功能，支持话题列表总结，支持API配置历史管理，支持话题列表一键快速总结。
 // @author       半杯无糖、WolfHolo、LD Export
 // @match        https://linux.do/*
@@ -2927,22 +2927,35 @@
                 .ld-qs-msg-label{font-size:11px;font-weight:600;color:#e3a043;margin-bottom:4px;}
                 .ld-qs-msg-ai .ld-qs-msg-label{color:#888;}
                 @media(max-width:768px){
-                    .ld-qs-btn{position:static;transform:none;display:inline-block;margin:4px 0 4px 6px;padding:5px 12px;font-size:13px;vertical-align:middle;}
+                    .ld-qs-btn{position:static;transform:none;display:inline-block;margin:4px 0 4px 6px;padding:6px 14px;font-size:13px;vertical-align:middle;border-radius:6px;-webkit-tap-highlight-color:transparent;}
+                    .ld-qs-btn:active{transform:scale(.95);opacity:.85;}
                     .ld-qs-modal{width:100vw;max-width:100vw;height:100vh;max-height:100vh;border-radius:0;}
-                    .ld-qs-header{padding:12px 14px;}
+                    .ld-qs-header{padding:env(safe-area-inset-top,12px) 14px 12px;position:sticky;top:0;background:inherit;z-index:2;}
                     .ld-qs-title{font-size:14px;}
-                    .ld-qs-close{font-size:24px;padding:4px 10px;}
-                    .ld-qs-body{padding:14px;font-size:15px;line-height:1.8;}
-                    .ld-qs-history-float{bottom:14px;right:14px;padding:10px 16px;font-size:14px;border-radius:20px;}
-                    .ld-qs-regen{padding:6px 12px;font-size:13px;}
-                    .ld-qs-hist-item{padding:12px;flex-wrap:wrap;}
+                    .ld-qs-close{font-size:26px;padding:8px 12px;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;}
+                    .ld-qs-regen{padding:8px 14px;font-size:13px;min-height:44px;}
+                    .ld-qs-body{padding:14px;font-size:15px;line-height:1.8;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;}
+                    .ld-qs-body pre{font-size:12px;padding:10px;max-width:calc(100vw - 28px);white-space:pre-wrap;word-break:break-all;}
+                    .ld-qs-body code{font-size:13px;word-break:break-all;}
+                    .ld-qs-body blockquote{padding:10px 12px;margin:10px 0;}
+                    .ld-qs-body img{max-width:100%;height:auto;}
+                    .ld-qs-body table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;}
+                    .ld-qs-footer{padding:10px 14px env(safe-area-inset-bottom,10px);position:sticky;bottom:0;background:inherit;z-index:2;}
+                    .ld-qs-input{font-size:16px;padding:10px 14px;min-height:44px;border-radius:10px;}
+                    .ld-qs-send{padding:10px 18px;font-size:14px;min-height:44px;border-radius:10px;-webkit-tap-highlight-color:transparent;}
+                    .ld-qs-send:active{transform:scale(.95);}
+                    .ld-qs-msg{padding:10px 12px;font-size:14px;line-height:1.7;}
+                    .ld-qs-msg-user{margin-left:10%;}
+                    .ld-qs-msg-label{font-size:12px;}
+                    .ld-qs-history-float{bottom:env(safe-area-inset-bottom,20px);right:14px;padding:12px 18px;font-size:14px;border-radius:24px;min-height:48px;-webkit-tap-highlight-color:transparent;}
+                    .ld-qs-history-float:active{transform:scale(.95);}
+                    .ld-qs-hist-item{padding:14px;flex-wrap:wrap;-webkit-tap-highlight-color:transparent;}
+                    .ld-qs-hist-item:active{background:rgba(227,160,67,.12);}
                     .ld-qs-hist-info{width:100%;margin-right:0;margin-bottom:8px;}
-                    .ld-qs-hist-title{white-space:normal;font-size:14px;}
+                    .ld-qs-hist-title{white-space:normal;font-size:14px;line-height:1.5;}
                     .ld-qs-hist-meta{font-size:12px;}
                     .ld-qs-hist-actions{width:100%;justify-content:flex-end;}
-                    .ld-qs-hist-view,.ld-qs-hist-del{padding:6px 14px;font-size:13px;}
-                    .ld-qs-input{font-size:16px;}
-                    .ld-qs-send{padding:10px 16px;font-size:14px;}
+                    .ld-qs-hist-view,.ld-qs-hist-del{padding:8px 18px;font-size:13px;min-height:40px;border-radius:6px;-webkit-tap-highlight-color:transparent;}
                 }
                 .ld-qs-dark .ld-qs-modal{background:#282a36;box-shadow:0 8px 32px rgba(0,0,0,.5);}
                 .ld-qs-dark .ld-qs-header{border-color:rgba(255,255,255,.08);}
