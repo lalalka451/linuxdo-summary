@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Linux.do 智能总结
 // @namespace    http://tampermonkey.net/
-// @version      7.9.8
+// @version      7.9.9
 // @description  Linux.do 帖子总结与导出，集成HTML离线导出和AI文本导出功能，支持话题列表总结，支持API配置历史管理，支持话题列表一键快速总结。
 // @author       半杯无糖、WolfHolo、LD Export
 // @match        https://linux.do/*
@@ -3011,23 +3011,26 @@
             const skipCatsRaw = GM_getValue(CONFIG.filterSkipCatsKey, '');
             const skipCats = skipCatsRaw ? skipCatsRaw.split(',').map(s => s.trim().toLowerCase()).filter(Boolean) : [];
             document.querySelectorAll('tr.topic-list-item, .topic-list-item').forEach(row => {
+                let hidden = false;
+                if (minReplies > 0) {
+                    const postsCell = row.querySelector('td.num.posts-map.posts, .posts-map .posts');
+                    const replyCount = parseInt(postsCell?.textContent?.trim(), 10) || 0;
+                    if (replyCount < minReplies) hidden = true;
+                }
+                if (!hidden && skipCats.length > 0) {
+                    const catBadge = row.querySelector('.badge-category__name');
+                    const catName = catBadge?.textContent?.trim()?.toLowerCase() || '';
+                    const catClass = [...row.classList].find(c => c.startsWith('category-'))?.replace('category-', '').toLowerCase() || '';
+                    if (skipCats.some(sc => catName === sc || catClass === sc)) hidden = true;
+                }
+                if (hidden) { row.style.display = 'none'; return; }
+                row.style.display = '';
                 if (row.querySelector('.ld-qs-btn')) return;
                 const link = row.querySelector('a.title.raw-link, a.raw-topic-link');
                 if (!link) return;
                 const href = link.getAttribute('href') || '';
                 const tid = href.match(/\/t\/[^/]+\/(\d+)/)?.[1];
                 if (!tid) return;
-                if (minReplies > 0) {
-                    const postsCell = row.querySelector('td.num.posts-map.posts, .posts-map .posts');
-                    const replyCount = parseInt(postsCell?.textContent?.trim(), 10) || 0;
-                    if (replyCount < minReplies) return;
-                }
-                if (skipCats.length > 0) {
-                    const catBadge = row.querySelector('.badge-category__name');
-                    const catName = catBadge?.textContent?.trim()?.toLowerCase() || '';
-                    const catClass = [...row.classList].find(c => c.startsWith('category-'))?.replace('category-', '').toLowerCase() || '';
-                    if (skipCats.some(sc => catName === sc || catClass === sc)) return;
-                }
                 const title = link.textContent.trim();
                 const mainCell = row.querySelector('td.main-link, .main-link') || row;
                 mainCell.style.position = 'relative';
