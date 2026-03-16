@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Linux.do 智能总结
 // @namespace    http://tampermonkey.net/
-// @version      7.9.7
+// @version      7.9.8
 // @description  Linux.do 帖子总结与导出，集成HTML离线导出和AI文本导出功能，支持话题列表总结，支持API配置历史管理，支持话题列表一键快速总结。
 // @author       半杯无糖、WolfHolo、LD Export
 // @match        https://linux.do/*
@@ -32,6 +32,8 @@
         maxHistoryItems: 10,
         summaryCacheKey: 'ld_summary_cache',
         maxSummaryCache: 10,
+        filterMinRepliesKey: 'ld_qs_filter_min_replies',
+        filterSkipCatsKey: 'ld_qs_filter_skip_cats',
     };
 
     // =================================================================================
@@ -2882,6 +2884,23 @@
                 .ld-qs-btn.ld-qs-cached:hover,.ld-qs-btn.ld-qs-cached:active{background:#4a8a4a;}
                 .ld-qs-history-float{position:fixed;bottom:20px;right:20px;padding:8px 14px;font-size:13px;background:#e3a043;color:#fff;border:none;border-radius:8px;cursor:pointer;z-index:100000;box-shadow:0 2px 10px rgba(0,0,0,.3);}
                 .ld-qs-history-float:hover,.ld-qs-history-float:active{background:#d4912e;}
+                .ld-qs-filter-float{position:fixed;bottom:64px;right:20px;width:36px;height:36px;font-size:16px;line-height:36px;text-align:center;background:#6272a4;color:#fff;border:none;border-radius:50%;cursor:pointer;z-index:100000;box-shadow:0 2px 10px rgba(0,0,0,.3);}
+                .ld-qs-filter-float:hover,.ld-qs-filter-float:active{background:#505d8a;}
+                .ld-qs-filter-field{margin-bottom:14px;}
+                .ld-qs-filter-label{display:block;font-size:13px;font-weight:500;margin-bottom:4px;color:#333;}
+                .ld-qs-filter-input{width:100%;padding:8px 10px;font-size:14px;border:1px solid #ddd;border-radius:6px;outline:none;background:transparent;color:inherit;box-sizing:border-box;}
+                .ld-qs-filter-input:focus{border-color:#e3a043;}
+                .ld-qs-filter-hint{font-size:11px;color:#888;margin-top:3px;}
+                .ld-qs-filter-save{display:block;width:100%;padding:10px;font-size:14px;background:#e3a043;color:#fff;border:none;border-radius:8px;cursor:pointer;}
+                .ld-qs-filter-save:hover,.ld-qs-filter-save:active{background:#d4912e;}
+                .ld-qs-dark .ld-qs-filter-label{color:#f8f8f2;}
+                .ld-qs-dark .ld-qs-filter-input{background:#1e1f29;border-color:rgba(255,255,255,.1);color:#f8f8f2;}
+                .ld-qs-dark .ld-qs-filter-input::placeholder{color:#6272a4;}
+                .ld-qs-dark .ld-qs-filter-hint{color:#6272a4;}
+                @media(max-width:768px){
+                    .ld-qs-filter-float{bottom:78px;right:14px;width:44px;height:44px;font-size:18px;line-height:44px;-webkit-tap-highlight-color:transparent;}
+                    .ld-qs-filter-float:active{transform:scale(.95);}
+                }
                 .ld-qs-regen{background:none;border:1px solid #e3a043;color:#e3a043;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px;white-space:nowrap;}
                 .ld-qs-regen:hover,.ld-qs-regen:active{background:#e3a043;color:#fff;}
                 .ld-qs-hist-item{display:flex;align-items:center;justify-content:space-between;padding:10px;margin-bottom:6px;border:1px solid #eee;border-radius:8px;cursor:pointer;transition:background .15s;}
@@ -2988,6 +3007,9 @@
 
         addButtons() {
             if (!/^\/(latest|top|new|unread|categories|c\/|$)/.test(location.pathname) && location.pathname !== '/') return;
+            const minReplies = parseInt(GM_getValue(CONFIG.filterMinRepliesKey, 0), 10) || 0;
+            const skipCatsRaw = GM_getValue(CONFIG.filterSkipCatsKey, '');
+            const skipCats = skipCatsRaw ? skipCatsRaw.split(',').map(s => s.trim().toLowerCase()).filter(Boolean) : [];
             document.querySelectorAll('tr.topic-list-item, .topic-list-item').forEach(row => {
                 if (row.querySelector('.ld-qs-btn')) return;
                 const link = row.querySelector('a.title.raw-link, a.raw-topic-link');
@@ -2995,6 +3017,17 @@
                 const href = link.getAttribute('href') || '';
                 const tid = href.match(/\/t\/[^/]+\/(\d+)/)?.[1];
                 if (!tid) return;
+                if (minReplies > 0) {
+                    const postsCell = row.querySelector('td.num.posts-map.posts, .posts-map .posts');
+                    const replyCount = parseInt(postsCell?.textContent?.trim(), 10) || 0;
+                    if (replyCount < minReplies) return;
+                }
+                if (skipCats.length > 0) {
+                    const catBadge = row.querySelector('.badge-category__name');
+                    const catName = catBadge?.textContent?.trim()?.toLowerCase() || '';
+                    const catClass = [...row.classList].find(c => c.startsWith('category-'))?.replace('category-', '').toLowerCase() || '';
+                    if (skipCats.some(sc => catName === sc || catClass === sc)) return;
+                }
                 const title = link.textContent.trim();
                 const mainCell = row.querySelector('td.main-link, .main-link') || row;
                 mainCell.style.position = 'relative';
@@ -3019,6 +3052,55 @@
             btn.textContent = '📋 总结历史';
             btn.onclick = () => this.showHistoryPanel();
             document.body.appendChild(btn);
+            if (!document.querySelector('.ld-qs-filter-float')) {
+                const fbtn = document.createElement('button');
+                fbtn.className = 'ld-qs-filter-float';
+                fbtn.textContent = '⚙';
+                fbtn.title = '总结按钮过滤设置';
+                fbtn.onclick = () => this._showFilterSettings();
+                document.body.appendChild(fbtn);
+            }
+        },
+
+        _showFilterSettings() {
+            const overlay = document.createElement('div');
+            overlay.className = 'ld-qs-overlay' + (this._isDark() ? ' ld-qs-dark' : '');
+            const curMin = GM_getValue(CONFIG.filterMinRepliesKey, 0);
+            const curCats = GM_getValue(CONFIG.filterSkipCatsKey, '');
+            overlay.innerHTML = `
+                <div class="ld-qs-modal" style="max-width:420px;">
+                    <div class="ld-qs-header">
+                        <div class="ld-qs-title">总结按钮过滤</div>
+                        <button class="ld-qs-close">&times;</button>
+                    </div>
+                    <div class="ld-qs-body" style="padding:18px;">
+                        <div class="ld-qs-filter-field">
+                            <label class="ld-qs-filter-label">最少回复数</label>
+                            <input class="ld-qs-filter-input" id="ld-qs-fmin" type="number" min="0" value="${curMin}" placeholder="0">
+                            <div class="ld-qs-filter-hint">低于此回复数的帖子不显示总结按钮（0 = 不过滤）</div>
+                        </div>
+                        <div class="ld-qs-filter-field">
+                            <label class="ld-qs-filter-label">跳过分类</label>
+                            <input class="ld-qs-filter-input" id="ld-qs-fcats" type="text" value="${curCats}" placeholder="feedback, dev-test">
+                            <div class="ld-qs-filter-hint">逗号分隔的分类名称，匹配的分类不显示总结按钮</div>
+                        </div>
+                        <button class="ld-qs-filter-save" id="ld-qs-fsave">保存</button>
+                    </div>
+                </div>`;
+            document.body.appendChild(overlay);
+            const close = () => overlay.remove();
+            overlay.querySelector('.ld-qs-close').onclick = close;
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+            const escH = (e) => { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', escH); } };
+            document.addEventListener('keydown', escH);
+            overlay.querySelector('#ld-qs-fsave').onclick = () => {
+                const minVal = parseInt(overlay.querySelector('#ld-qs-fmin').value, 10) || 0;
+                const catsVal = overlay.querySelector('#ld-qs-fcats').value.trim();
+                GM_setValue(CONFIG.filterMinRepliesKey, minVal);
+                GM_setValue(CONFIG.filterSkipCatsKey, catsVal);
+                close();
+                this.refreshButtons();
+            };
         },
 
         showHistoryPanel() {
