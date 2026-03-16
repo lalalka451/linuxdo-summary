@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Linux.do 智能总结
 // @namespace    http://tampermonkey.net/
-// @version      7.9.10
+// @version      7.9.11
 // @description  Linux.do 帖子总结与导出，集成HTML离线导出和AI文本导出功能，支持话题列表总结，支持API配置历史管理，支持话题列表一键快速总结。
 // @author       半杯无糖、WolfHolo、LD Export
 // @match        https://linux.do/*
@@ -34,6 +34,7 @@
         maxSummaryCache: 10,
         filterMinRepliesKey: 'ld_qs_filter_min_replies',
         filterSkipCatsKey: 'ld_qs_filter_skip_cats',
+        filterSkipTitlesKey: 'ld_qs_filter_skip_titles',
     };
 
     // =================================================================================
@@ -3010,6 +3011,8 @@
             const minReplies = parseInt(GM_getValue(CONFIG.filterMinRepliesKey, 0), 10) || 0;
             const skipCatsRaw = GM_getValue(CONFIG.filterSkipCatsKey, '');
             const skipCats = skipCatsRaw ? skipCatsRaw.split(',').map(s => s.trim().toLowerCase()).filter(Boolean) : [];
+            const skipTitlesRaw = GM_getValue(CONFIG.filterSkipTitlesKey, '');
+            const skipTitles = skipTitlesRaw ? skipTitlesRaw.split(',').map(s => s.trim().toLowerCase()).filter(Boolean) : [];
             document.querySelectorAll('tr.topic-list-item, .topic-list-item').forEach(row => {
                 let hidden = false;
                 if (minReplies > 0) {
@@ -3022,6 +3025,11 @@
                     const catName = catBadge?.textContent?.trim()?.toLowerCase() || '';
                     const catClass = [...row.classList].find(c => c.startsWith('category-'))?.replace('category-', '').toLowerCase() || '';
                     if (skipCats.some(sc => catName.includes(sc) || catClass.includes(sc))) hidden = true;
+                }
+                if (!hidden && skipTitles.length > 0) {
+                    const titleEl = row.querySelector('a.title.raw-link, a.raw-topic-link');
+                    const titleText = titleEl?.textContent?.trim()?.toLowerCase() || '';
+                    if (skipTitles.some(kw => titleText.includes(kw))) hidden = true;
                 }
                 if (hidden) { row.style.display = 'none'; return; }
                 row.style.display = '';
@@ -3070,6 +3078,7 @@
             overlay.className = 'ld-qs-overlay' + (this._isDark() ? ' ld-qs-dark' : '');
             const curMin = GM_getValue(CONFIG.filterMinRepliesKey, 0);
             const curCats = GM_getValue(CONFIG.filterSkipCatsKey, '');
+            const curTitles = GM_getValue(CONFIG.filterSkipTitlesKey, '');
             overlay.innerHTML = `
                 <div class="ld-qs-modal" style="max-width:420px;">
                     <div class="ld-qs-header">
@@ -3087,6 +3096,11 @@
                             <input class="ld-qs-filter-input" id="ld-qs-fcats" type="text" value="${curCats}" placeholder="feedback, dev-test">
                             <div class="ld-qs-filter-hint">逗号分隔，支持中文名或 slug（如 welfare, 福利羊毛）</div>
                         </div>
+                        <div class="ld-qs-filter-field">
+                            <label class="ld-qs-filter-label">屏蔽标题关键词</label>
+                            <input class="ld-qs-filter-input" id="ld-qs-ftitles" type="text" value="${curTitles}" placeholder="求助, 水贴">
+                            <div class="ld-qs-filter-hint">逗号分隔，标题含关键词的帖子会被隐藏</div>
+                        </div>
                         <button class="ld-qs-filter-save" id="ld-qs-fsave">保存</button>
                     </div>
                 </div>`;
@@ -3099,8 +3113,10 @@
             overlay.querySelector('#ld-qs-fsave').onclick = () => {
                 const minVal = parseInt(overlay.querySelector('#ld-qs-fmin').value, 10) || 0;
                 const catsVal = overlay.querySelector('#ld-qs-fcats').value.trim();
+                const titlesVal = overlay.querySelector('#ld-qs-ftitles').value.trim();
                 GM_setValue(CONFIG.filterMinRepliesKey, minVal);
                 GM_setValue(CONFIG.filterSkipCatsKey, catsVal);
+                GM_setValue(CONFIG.filterSkipTitlesKey, titlesVal);
                 close();
                 this.refreshButtons();
             };
