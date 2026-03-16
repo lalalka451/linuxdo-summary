@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Linux.do 智能总结
 // @namespace    http://tampermonkey.net/
-// @version      7.9.9
+// @version      7.9.10
 // @description  Linux.do 帖子总结与导出，集成HTML离线导出和AI文本导出功能，支持话题列表总结，支持API配置历史管理，支持话题列表一键快速总结。
 // @author       半杯无糖、WolfHolo、LD Export
 // @match        https://linux.do/*
@@ -3021,7 +3021,7 @@
                     const catBadge = row.querySelector('.badge-category__name');
                     const catName = catBadge?.textContent?.trim()?.toLowerCase() || '';
                     const catClass = [...row.classList].find(c => c.startsWith('category-'))?.replace('category-', '').toLowerCase() || '';
-                    if (skipCats.some(sc => catName === sc || catClass === sc)) hidden = true;
+                    if (skipCats.some(sc => catName.includes(sc) || catClass.includes(sc))) hidden = true;
                 }
                 if (hidden) { row.style.display = 'none'; return; }
                 row.style.display = '';
@@ -3085,7 +3085,7 @@
                         <div class="ld-qs-filter-field">
                             <label class="ld-qs-filter-label">跳过分类</label>
                             <input class="ld-qs-filter-input" id="ld-qs-fcats" type="text" value="${curCats}" placeholder="feedback, dev-test">
-                            <div class="ld-qs-filter-hint">逗号分隔的分类名称，匹配的分类不显示总结按钮</div>
+                            <div class="ld-qs-filter-hint">逗号分隔，支持中文名或 slug（如 welfare, 福利羊毛）</div>
                         </div>
                         <button class="ld-qs-filter-save" id="ld-qs-fsave">保存</button>
                     </div>
