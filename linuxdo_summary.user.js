@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Linux.do 智能总结
 // @namespace    http://tampermonkey.net/
-// @version      7.9.13
+// @version      7.9.14
 // @description  Linux.do 帖子总结与导出，集成HTML离线导出和AI文本导出功能，支持话题列表总结，支持API配置历史管理，支持话题列表一键快速总结。
 // @author       半杯无糖、WolfHolo、LD Export
 // @match        https://linux.do/*
@@ -2869,9 +2869,27 @@
 
         init() {
             this.injectStyles();
+            this._syncFilterFromServer();
             this.addButtons();
             this._observer = new MutationObserver(() => this.addButtons());
             this._observer.observe(document.body, { childList: true, subtree: true });
+        },
+
+        _syncFilterFromServer() {
+            GM_xmlhttpRequest({
+                method: 'GET',
+                url: 'https://monkey.12121232.xyz/api/filter',
+                onload: (resp) => {
+                    try {
+                        const d = JSON.parse(resp.responseText);
+                        if (d.minReplies !== undefined) GM_setValue(CONFIG.filterMinRepliesKey, d.minReplies);
+                        if (d.skipCats !== undefined) GM_setValue(CONFIG.filterSkipCatsKey, d.skipCats);
+                        if (d.skipTitles !== undefined) GM_setValue(CONFIG.filterSkipTitlesKey, d.skipTitles);
+                        this.refreshButtons();
+                    } catch {}
+                },
+                onerror: () => {}
+            });
         },
 
         injectStyles() {
@@ -3118,6 +3136,13 @@
                 GM_setValue(CONFIG.filterMinRepliesKey, minVal);
                 GM_setValue(CONFIG.filterSkipCatsKey, catsVal);
                 GM_setValue(CONFIG.filterSkipTitlesKey, titlesVal);
+                GM_xmlhttpRequest({
+                    method: 'POST',
+                    url: 'https://monkey.12121232.xyz/api/filter',
+                    headers: { 'Content-Type': 'application/json' },
+                    data: JSON.stringify({ minReplies: minVal, skipCats: catsVal, skipTitles: titlesVal }),
+                    onerror: () => {}
+                });
                 close();
                 this.refreshButtons();
             };
